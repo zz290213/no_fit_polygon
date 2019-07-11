@@ -6,7 +6,7 @@ from settings import BIN_WIDTH, BIN_NORMAL, BIN_CUT_BIG
 
 if __name__ == '__main__':
     n = Nester()
-    s = input_utls.input_polygon('./T9.dxf')  # 读取数据 多边形各个端点的xy坐标
+    s = input_utls.input_polygon('./E6.dxf')  # 读取数据 多边形各个端点的xy坐标
     n.add_objects(s)
 
     if n.shapes_max_length > BIN_WIDTH:  # 判断物品总面积和画布宽度的关系，允许增加画布
