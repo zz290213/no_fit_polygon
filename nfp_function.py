@@ -32,7 +32,7 @@ class Nester:
         self.nfp_cache = {}     # 缓存中间计算结果
         # 遗传算法的参数
         self.config = {
-            'curveTolerance': 0.3,  # 允许的最大误差转换贝济耶和圆弧线段。在SVG的单位。更小的公差将需要更长的时间来计算
+            'curveTolerance': 0,  # 允许的最大误差转换贝济耶和圆弧线段。在SVG的单位。更小的公差将需要更长的时间来计算
             'spacing': SPACING,           # 组件间的间隔
             'rotations': ROTATIONS,         # 旋转的颗粒度，360°的n份，如：4 = [0, 90 ,180, 270]
             'populationSize': POPULATION_SIZE,    # 基因群数量
@@ -126,10 +126,10 @@ class Nester:
         for i in range(0, len(self.shapes)):
             shape = copy.deepcopy(self.shapes[i])
             shape['points'] = self.polygon_offset(shape['points'], self.config['spacing'])
-            faces.append([str(i), shape])
+            faces.append([str(i), shape])  # 将每个多边形的数据加上序号
         # build a clean copy so we don't touch the original
         # order by area
-        faces = sorted(faces, reverse=True, key=lambda face: face[1]['area'])
+        faces = sorted(faces, reverse=True, key=lambda face: face[1]['area'])  # 按面积降序排列
         return self.launch_workers(faces)
 
     def launch_workers(self, adam):
@@ -188,7 +188,7 @@ class Nester:
             }
 
             tmp_json_key = json.dumps(key)
-            if not self.nfp_cache.has_key(tmp_json_key):
+            if tmp_json_key not in self.nfp_cache:
                 nfp_pairs.append({
                     'A': self.container,
                     'B': part[1],
@@ -209,7 +209,7 @@ class Nester:
                     'B_rotation': rotations[i]
                 }
                 tmp_json_key = json.dumps(key)
-                if not self.nfp_cache.has_key(tmp_json_key):
+                if tmp_json_key not in self.nfp_cache:
                     nfp_pairs.append({
                         'A': placed[1],
                         'B': part[1],
@@ -255,7 +255,7 @@ class Nester:
 
         if pair['key']['inside']:
             # 内切或者外切
-            if nfp_utls.is_rectangle(A['points'], 0.0001):
+            if nfp_utls.is_rectangle(A['points'], 0.0001):  # 内切的话，判断物品尺寸是否在板材只存之内
                 nfp = nfp_utls.nfp_rectangle(A['points'], B['points'])
             else:
                 nfp = nfp_utls.nfp_polygon(A, B, True, search_edges)
@@ -358,7 +358,7 @@ class Nester:
             return None
 
         biggest = simple[0]
-        biggest_area = pyclipper.Area(biggest)
+        biggest_area = pyclipper.Area(biggest)  # 给出端点，求多边形面积，端点顺序一定要是逆时针的，否则结果为负
         for i in range(1, len(simple)):
             area = abs(pyclipper.Area(simple[i]))
             if area > biggest_area:
@@ -396,7 +396,7 @@ def draw_result(shift_data, polygons, bin_polygon, bin_bounds):
         tmp_bin = list()
         total_area = 0.0
         for move_step in s_data:
-            if move_step['rotation'] <> 0:
+            if move_step['rotation'] != 0:
                 # 坐标原点旋转
                 shapes[int(move_step['p_id'])].rotate(math.pi / 180 * move_step['rotation'], 0, 0)
             # 平移
@@ -429,7 +429,7 @@ class genetic_algorithm():
         }
         self.config = config
         self.bin_polygon = bin_polygon
-        angles = list()
+        angles = list()  # 添加角度
         shapes = copy.deepcopy(adam)
         for shape in shapes:
             angles.append(self.random_angle(shape))
@@ -465,11 +465,11 @@ class genetic_algorithm():
             rotate_part = nfp_utls.rotate_polygon(shape[1]['points'], angle)
             # 是否判断旋转出界,没有出界可以返回旋转角度,rotate 只是尝试去转，没有真正改变图形坐标
             if rotate_part['width'] < self.bin_bounds['width'] and rotate_part['height'] < self.bin_bounds['height']:
-                return angle_list[i]
+                return angle  # 将angle_list[i] 修改为angle
 
         return 0
 
-    def mutate(self, individual):
+    def mutate(self, individual):  # 变异1：交换两个物品的排放位置   变异2：转换一个物品的角度
         clone = {
             'placement': individual['placement'][:],
             'rotation': individual['rotation'][:]
@@ -499,7 +499,7 @@ class genetic_algorithm():
             if len(new_population) < self.config['populationSize']:
                 new_population.append(self.mutate(children[1]))
 
-        print 'new :', new_population
+        print('new :', new_population)
         self.population = new_population
 
     def random_weighted_individual(self, exclude=None):
@@ -647,10 +647,10 @@ def content_loop_rate(best, n, loop_time=20):
     while run_time:
         n.run()
         best = n.best
-        print best['fitness']
+        print(best['fitness'])
         if best['fitness'] <= res['fitness']:
             res = best
-            print 'change', res['fitness']
+            print('change', res['fitness'])
         run_time -= 1
     draw_result(res['placements'], n.shapes, n.container, n.container_bounds)
 

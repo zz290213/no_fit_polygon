@@ -8,7 +8,7 @@ def find_shape_from_dxf(file_name):
     :param file_name: 文档路径
     :return:
     """
-    dxf = dxfgrabber.readfile(file_name)
+    dxf = dxfgrabber.readfile(file_name)  # 读取dxf文件
     all_shapes = list()
     new_polygon = dict()
     for e in dxf.entities:
@@ -18,20 +18,20 @@ def find_shape_from_dxf(file_name):
             # 线条不按顺序画
             end_key = '{}x{}'.format(e.end[0], e.end[1])
             star_key = '{}x{}'.format(e.start[0], e.start[1])
-            if new_polygon.has_key(end_key):
+            if end_key in new_polygon:
                 # 找到闭合的多边形
                 all_shapes.append(new_polygon[end_key])
                 new_polygon.pop(end_key)
                 continue
 
             # 开始和结束点转换
-            if new_polygon.has_key(star_key):
+            if star_key in new_polygon:
                 # 找到闭合的多边形
                 all_shapes.append(new_polygon[star_key])
                 new_polygon.pop(star_key)
                 continue
 
-            # 找连接的点
+            # 新边与老边有共同点，则在老边字典中添加新边另一端点
             has_find = False
             for key, points in new_polygon.items():
                 if points[-1][0] == e.start[0] and points[-1][1] == e.start[1]:
@@ -56,16 +56,18 @@ def input_polygon(dxf_file):
     :return:
     """
     # 从dxf文件中提取数据
-    datas = find_shape_from_dxf(dxf_file)
+    datas = find_shape_from_dxf(dxf_file) # 数据形式 [[[第一个多边形第一条边xy坐标], [第一个多边形第二条边xy坐标]...]...]
+    # [[[559.3344489300162, 446.4795913483341], [556.441357159191, 442.8149327950991],
+    #  [562.7165139086547, 442.8149327950991]].......]
     shapes = list()
 
     for i in range(0, len(datas)):
         shapes.append(datas[i])
 
-    print shapes
+    print(shapes)
     return shapes
 
 if __name__ == '__main__':
-    s = find_shape_from_dxf('T2.dxf')
+    s = find_shape_from_dxf('./E6.dxf')
     print(s)
-    print len(s)
+    print(len(s))

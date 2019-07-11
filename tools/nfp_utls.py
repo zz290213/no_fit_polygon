@@ -20,11 +20,11 @@ def almost_equal(a, b, tolerance=None):
 def is_rectangle(poly, tolerance=None):
     bb = get_polygon_bounds(poly)
     tolerance = tolerance or TOL
-    for point in poly:
-        if not almost_equal(point['x'], bb['x'], tolerance) and not almost_equal(
+    for point in poly:  # 保证物品的顶点坐标都位于板材内部
+        if not almost_equal(point['x'], bb['x'], tolerance) and not almost_equal(  # 物品x坐标即大于布料最小x坐标又大于最大坐标，返回错误。
                 point['x'], bb['x'] + bb['width'], tolerance):
             return False
-        if not almost_equal(point['y'], bb['y'], tolerance) and not almost_equal(
+        if not almost_equal(point['y'], bb['y'], tolerance) and not almost_equal(  # 物品y坐标即大于布料最小y坐标又大于最大坐标，返回错误。
                 point['y'], bb['y'] + bb['height'], tolerance):
             return False
 

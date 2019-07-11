@@ -125,7 +125,7 @@ class PlacementWorker():
                 try:
                     clipper.AddPaths(clipper_bin_nfp, pyclipper.PT_SUBJECT, True)
                 except:
-                    print u'图形坐标出错', clipper_bin_nfp
+                    print(u'图形坐标出错', clipper_bin_nfp)
 
                 # choose placement that results in the smallest bounding box
                 finalNfp = clipper.Execute(pyclipper.CT_DIFFERENCE, pyclipper.PFT_NONZERO, pyclipper.PFT_NONZERO)
