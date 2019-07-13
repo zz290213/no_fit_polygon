@@ -103,7 +103,7 @@ def triangle(data, n=1):
 
 def find_shape_from_csv(file_name, n):
     point_list = []
-    datas = pd.read_csv(file_name)
+    datas = pd.read_csv(file_name, encoding='gbk')
     for index in datas.index:
         shape = datas.loc[index]
         if shape['物料代码'] == 0:
@@ -128,3 +128,4 @@ if __name__ == '__main__':
     # s = find_shape_from_dxf('T2.dxf')
     print(s)
     print(len(s))
+

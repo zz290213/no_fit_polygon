@@ -37,7 +37,7 @@ class Nester:
             'rotations': ROTATIONS,         # 旋转的颗粒度，360°的n份，如：4 = [0, 90 ,180, 270]
             'populationSize': POPULATION_SIZE,    # 基因群数量
             'mutationRate': MUTA_RATE,      # 变异概率
-            'useHoles': False,       # 是否有洞，暂时都是没有洞
+            'useHoles': True,       # 是否有洞，暂时都是没有洞
             'exploreConcave': False  # 寻找凹面，暂时是否
         }
 
