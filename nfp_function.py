@@ -642,9 +642,11 @@ def content_loop_rate(best, n, loop_time=20):
     :param loop_time:
     :return:
     """
+
     res = best
     run_time = loop_time
     while run_time:
+        print('run_time', run_time)
         n.run()
         best = n.best
         print(best['fitness'])
